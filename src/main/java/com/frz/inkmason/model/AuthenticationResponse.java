@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class AuthenticationResponse {
     String token;
-    String statusCode;
+    int statusCode;
     String statusMessage;
 }

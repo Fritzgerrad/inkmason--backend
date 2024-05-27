@@ -14,16 +14,24 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
-    @Value("${adminCreationPass}")
-    private String ADMINCREATIONPASS;
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody UserDto userDto){
-        if(userDto.getRole().equals(Role.admin) && (userDto.getAdminCreationPass() == null || !userDto.getAdminCreationPass().equals(ADMINCREATIONPASS))){
-            AuthenticationResponse response = new AuthenticationResponse("","91","You don't have Permission to create an admin");
+        AuthenticationResponse response = authenticationService.register(userDto);
+        if (response.getStatusCode() == 00){
+            return ResponseEntity.ok(response);
+        }
+
+        if (response.getStatusCode() == 91){
+            return ResponseEntity.status(400).body(response);
+        }
+
+        if (response.getStatusCode() == 92){
             return ResponseEntity.status(403).body(response);
         }
 
-        return ResponseEntity.ok(authenticationService.register(userDto));
+        return ResponseEntity.status(404).body(new AuthenticationResponse("",99,"An Unknown Error Occurred"));
+
     }
 
     @PostMapping("/login")
