@@ -1,4 +1,4 @@
-package com.frz.inkmason.util;
+package com.frz.inkmason.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.frz.inkmason.model.User;

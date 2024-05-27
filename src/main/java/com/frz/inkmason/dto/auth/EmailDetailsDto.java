@@ -1,5 +1,6 @@
 package com.frz.inkmason.dto.auth;
 
+import com.frz.inkmason.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,4 +14,6 @@ public class EmailDetailsDto {
     private String recipient;
     private String messageBody;
     private String subject;
+
+
 }
