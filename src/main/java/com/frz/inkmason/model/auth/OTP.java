@@ -22,7 +22,7 @@ public class OTP {
     private String otp;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id",unique = true)
     @JsonManagedReference()
     private User user;
 

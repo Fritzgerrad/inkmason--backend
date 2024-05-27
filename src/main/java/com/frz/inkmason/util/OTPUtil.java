@@ -1,5 +1,6 @@
 package com.frz.inkmason.util;
 
+import com.frz.inkmason.dto.auth.EmailDetailsDto;
 import com.frz.inkmason.enums.StatusCode;
 import com.frz.inkmason.model.User;
 import com.frz.inkmason.model.auth.OTP;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 @RequiredArgsConstructor
 @Service
@@ -53,5 +55,14 @@ public class OTPUtil {
         otpRepository.delete(temp);
         return response;
 
+    }
+
+    public String regenerateOTP(User user){
+        OTP temp = otpRepository.findByUser(user);
+        if(temp != null){
+            otpRepository.delete(temp);
+        }
+        String otp = generateOTP(user);
+        return otp;
     }
 }

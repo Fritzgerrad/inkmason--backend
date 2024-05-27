@@ -91,4 +91,15 @@ public class AuthenticationService {
         return otpUtil.validateOTP(user.get(),otpDto.getOtp());
     }
 
+    public Response resendOTP(OTPDto otpDto){
+        Optional <User> user = userRepository.findUserByEmail(otpDto.getEmail());
+        if(user.isEmpty()){
+            return new LocalResponse(StatusCode.badRequest, "User does not exist");
+        }
+        String otp = otpUtil.regenerateOTP(user.get());
+        EmailDetailsDto emailDetailsDto = emailService.generateRegistrationOTPMail(user.get(),otp);
+        emailService.sendEmail(emailDetailsDto);
+        return new LocalResponse(StatusCode.successful,"OTP Successfully Resent");
+    }
+
 }

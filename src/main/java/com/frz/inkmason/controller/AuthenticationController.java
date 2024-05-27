@@ -66,6 +66,19 @@ public class AuthenticationController {
         }
     }
 
+    @GetMapping("/resend-otp")
+    public ResponseEntity<Response> resendOTP(
+            @RequestParam(value = "email") String email){
+        Response response = authenticationService.resendOTP(new OTPDto(email,""));
+        System.out.println(email);
+        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+            return ResponseEntity.status(400).body(response);
+        }
+        else{
+            return ResponseEntity.ok(response);
+        }
+    }
+
 
 
 
