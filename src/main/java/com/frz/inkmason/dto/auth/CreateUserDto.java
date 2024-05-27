@@ -1,14 +1,13 @@
-package com.frz.inkmason.dto;
+package com.frz.inkmason.dto.auth;
 
-import com.frz.inkmason.model.Role;
+import com.frz.inkmason.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class CreateUserDto {
     private String email;
     private String firstname;
     private String lastname;
@@ -16,6 +15,5 @@ public class UserDto {
     private String phone;
     private Role role;
     private String adminCreationPass;
-    //private boolean allowsNewsLetter;
 
 }

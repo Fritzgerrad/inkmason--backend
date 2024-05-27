@@ -1,5 +1,6 @@
 package com.frz.inkmason.model;
 
+import com.frz.inkmason.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class User implements UserDetails {
     private String phone;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private boolean isVerified;
     //private boolean allowsNewsLetter;
     private Date createdAt;
     private Date updatedAt;
