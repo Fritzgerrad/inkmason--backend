@@ -18,8 +18,6 @@ import java.util.Random;
 @Service
 public class OTPUtil {
     private final OTPRepository otpRepository;
-    private final UserRepository userRepository;
-
 
     public String generateOTP(User user) {
         Random random = new Random();
@@ -33,28 +31,20 @@ public class OTPUtil {
         return otp.getOtp();
     }
 
-    public Response validateOTP(User user, String otp) {
+    public int validateOTP(User user, String otp) {
         OTP temp = otpRepository.findByUser(user);
-        Response response = new LocalResponse();
         if (temp != null && temp.getOtp().equals(otp)) {
             if (temp.getExpiryTime().after(new Date())) {
-                user.setVerified(true);
-                user = userRepository.save(user);
-                response.setStatusCode(StatusCode.successful);
-                response.setStatusMessage("OTP Successfully Validated");
+                otpRepository.delete(temp);
+                return 0;
             }
             else {
-                response.setStatusCode(StatusCode.badRequest);
-                response.setStatusMessage("OTP has Expired");
+                return 1;
             }
         }
         else {
-            response.setStatusCode(StatusCode.badRequest);
-            response.setStatusMessage("OTP Not a Match");
+            return 2;
         }
-        otpRepository.delete(temp);
-        return response;
-
     }
 
     public String regenerateOTP(User user){

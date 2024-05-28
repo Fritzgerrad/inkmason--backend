@@ -3,8 +3,8 @@ package com.frz.inkmason.controller;
 import com.frz.inkmason.dto.auth.CreateUserDto;
 import com.frz.inkmason.dto.auth.LoginUserDto;
 import com.frz.inkmason.dto.auth.OTPDto;
+import com.frz.inkmason.dto.auth.ResetPasswordDTO;
 import com.frz.inkmason.enums.StatusCode;
-import com.frz.inkmason.model.response.AuthResponse;
 import com.frz.inkmason.model.response.LocalResponse;
 import com.frz.inkmason.model.response.Response;
 import com.frz.inkmason.service.AuthenticationService;
@@ -69,8 +69,30 @@ public class AuthenticationController {
     @GetMapping("/resend-otp")
     public ResponseEntity<Response> resendOTP(
             @RequestParam(value = "email") String email){
-        Response response = authenticationService.resendOTP(new OTPDto(email,""));
-        System.out.println(email);
+        Response response = authenticationService.sendOTPToCurrentUser(new OTPDto(email,""),"verifyAccount");
+        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+            return ResponseEntity.status(400).body(response);
+        }
+        else{
+            return ResponseEntity.ok(response);
+        }
+    }
+
+    @GetMapping("/forgot-password")
+    public ResponseEntity<Response> forgotPassword(
+            @RequestParam(value = "email") String email){
+        Response response = authenticationService.sendOTPToCurrentUser(new OTPDto(email,""),"");
+        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+            return ResponseEntity.status(400).body(response);
+        }
+        else{
+            return ResponseEntity.ok(response);
+        }
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<Response> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
+        Response response = authenticationService.passwordReset(resetPasswordDTO);
         if(response.getStatusCode().equals(StatusCode.badRequest)) {
             return ResponseEntity.status(400).body(response);
         }

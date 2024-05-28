@@ -46,5 +46,13 @@ public class EmailService {
         );
     }
 
+    public EmailDetailsDto generatePasswordResetOTPMail(User user, String otp) {
+        String name = user.getFirstname();
+        String message =  String.format("Dear %s,%n%nYou are receiving this email because you requested to change the password to your InkhMason Account. %n%n Use the One Time Password: %s%nThank you!", name, otp);
+        return new EmailDetailsDto(
+                user.getEmail(), message, "Change your InkhMason Account Password"
+        );
+    }
+
 
 }

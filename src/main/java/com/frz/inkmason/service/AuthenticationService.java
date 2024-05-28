@@ -1,9 +1,6 @@
 package com.frz.inkmason.service;
 
-import com.frz.inkmason.dto.auth.CreateUserDto;
-import com.frz.inkmason.dto.auth.EmailDetailsDto;
-import com.frz.inkmason.dto.auth.LoginUserDto;
-import com.frz.inkmason.dto.auth.OTPDto;
+import com.frz.inkmason.dto.auth.*;
 import com.frz.inkmason.enums.StatusCode;
 import com.frz.inkmason.model.response.AuthResponse;
 import com.frz.inkmason.model.response.LocalResponse;
@@ -83,23 +80,71 @@ public class AuthenticationService {
     }
 
     public Response verifyOTP(OTPDto otpDto){
-        System.out.println(otpDto);
-        Optional <User> user = userRepository.findUserByEmail(otpDto.getEmail());
-        if(user.isEmpty()){
+        Response response = new LocalResponse();
+        Optional <User> userOptional = userRepository.findUserByEmail(otpDto.getEmail());
+        if(userOptional.isEmpty()){
             return new LocalResponse(StatusCode.badRequest, "User not Found");
         }
-        return otpUtil.validateOTP(user.get(),otpDto.getOtp());
+        User user = userOptional.get();
+        int otpStatus = otpUtil.validateOTP(user,otpDto.getOtp());
+        switch (otpStatus){
+            case 0:
+                user.setVerified(true);
+                userRepository.save(user);
+                response.setStatusCode(StatusCode.successful);
+                response.setStatusMessage("OTP Successfully Validated");
+                break;
+            case 1:
+                response.setStatusCode(StatusCode.badRequest);
+                response.setStatusMessage("OTP has Expired");
+                break;
+
+            case 2:
+                response.setStatusCode(StatusCode.badRequest);
+                response.setStatusMessage("OTP Not a Match");
+                break;
+
+            default:
+                response.setStatusCode(StatusCode.unknownError);
+                response.setStatusMessage("An Unknown Error Occurred");
+        }
+        return response;
     }
 
-    public Response resendOTP(OTPDto otpDto){
+    public Response sendOTPToCurrentUser(OTPDto otpDto,String action){
         Optional <User> user = userRepository.findUserByEmail(otpDto.getEmail());
         if(user.isEmpty()){
             return new LocalResponse(StatusCode.badRequest, "User does not exist");
         }
         String otp = otpUtil.regenerateOTP(user.get());
-        EmailDetailsDto emailDetailsDto = emailService.generateRegistrationOTPMail(user.get(),otp);
+        EmailDetailsDto emailDetailsDto;
+        if (action == "verifyAccount"){
+            emailDetailsDto = emailService.generateRegistrationOTPMail(user.get(),otp);
+        }
+        else{
+            emailDetailsDto = emailService.generatePasswordResetOTPMail(user.get(),otp);
+        }
         emailService.sendEmail(emailDetailsDto);
         return new LocalResponse(StatusCode.successful,"OTP Successfully Resent");
     }
+
+    public Response passwordReset(ResetPasswordDTO resetPasswordDTO){
+        Optional<User> userOptional = userRepository.findUserByEmail(resetPasswordDTO.getEmail());
+        if(userOptional.isEmpty()){
+            return new LocalResponse(StatusCode.badRequest, "User does not exist");
+        }
+        User user = userOptional.get();
+        int otpStatus = otpUtil.validateOTP(user, resetPasswordDTO.getToken());
+
+        if (otpStatus == 0){
+            user.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
+            userRepository.save(user);
+            return new LocalResponse(StatusCode.successful,"Password Changed Successfully");
+        }
+        else {
+            return new LocalResponse(StatusCode.badRequest,"Invalid OTP");
+        }
+    }
+
 
 }
