@@ -1,6 +1,7 @@
-package com.frz.inkmason.model;
+package com.frz.inkmason.enums;
 
 public enum Role {
     admin,
     user,
+    guest
 }
