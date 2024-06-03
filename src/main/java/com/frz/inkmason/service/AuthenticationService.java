@@ -8,7 +8,8 @@ import com.frz.inkmason.model.response.Response;
 import com.frz.inkmason.enums.Role;
 import com.frz.inkmason.model.User;
 import com.frz.inkmason.repository.UserRepository;
-import com.frz.inkmason.util.OTPUtil;
+import com.frz.inkmason.util.JwtUtil;
+import com.frz.inkmason.util.OtpUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,10 +28,10 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
-    private final OTPUtil otpUtil;
+    private final OtpUtil otpUtil;
 
 
     public Response register(CreateUserDto userDto) {
@@ -59,7 +60,7 @@ public class AuthenticationService {
         user = userRepository.save(user);
         String otp = otpUtil.generateOTP(user);
 
-        String token = jwtService.generateToken(user);
+        String token = jwtUtil.generateToken(user);
         EmailDetailsDto emailDetailsDto = emailService.generateRegistrationOTPMail(user,otp);
         emailService.sendEmail(emailDetailsDto);
 
@@ -74,7 +75,7 @@ public class AuthenticationService {
                 )
         );
         User user = userRepository.findUserByEmail(loginUserDto.getIdentifier()).orElseThrow();
-        String token = jwtService.generateToken(user);
+        String token = jwtUtil.generateToken(user);
 
         return new AuthResponse(token, user.getFirstname(), user.getRole(), user.isVerified(), StatusCode.successful,"Login Successful", user.getId());
     }

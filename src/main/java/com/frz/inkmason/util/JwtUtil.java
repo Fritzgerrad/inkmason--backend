@@ -1,63 +1,70 @@
-package com.frz.inkmason.util;//package com.frz.inkmason.util;
-//
-//import java.util.Collection;
-//import java.util.Date;
-//import java.util.HashMap;
-//import java.util.Map;
-//
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.security.core.GrantedAuthority;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.stereotype.Service;
-//
-//import io.jsonwebtoken.Jwts;
-//import io.jsonwebtoken.SignatureAlgorithm;
-//
-//@Service
-//public class JwtUtil {
-//    private String secret;
-//    private int jwtExpirationInMs;
-//
-//    @Value("${jwt.secret}")
-//    public void setSecret(String secret) {
-//        this.secret = secret;
-//    }
-//
-//    @Value("${jwt.expirationDateInMs}")
-//    public void setJwtExpirationInMs(int jwtExpirationInMs) {
-//        this.jwtExpirationInMs = jwtExpirationInMs;
-//    }
-//
-//    // generate token for user
-//    public String generateToken(UserDetails userDetails) {
-//        Map<String, Object> claims = new HashMap<>();
-//        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
-//        if (roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-//            claims.put("isAdmin", true);
-//        }
-//        if (roles.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
-//            claims.put("isUser", true);
-//        }
-//        return doGenerateToken(claims, userDetails.getUsername());
-//    }
-//
-//    private String doGenerateToken(Map<String, Object> claims, String subject) {
-//
-//        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs)).signWith(SignatureAlgorithm.HS512, secret).compact();
-//    }
-//
-//    public boolean validateToken(String authToken) {
-//        try {
-//            // Jwt token has not been tampered with
-//            Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken);
-//            return true;
-//        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
-//            throw new BadCredentialsException("INVALID_CREDENTIALS", ex);
-//        } catch (ExpiredJwtException ex) {
-//            throw new ex(header, claims, "Token has Expired", ex);
-//        }
-//    }
-//
-//}
+package com.frz.inkmason.util;
+import com.frz.inkmason.model.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.function.Function;
+
+@Service
+public class JwtUtil {
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+
+    @Value("${jwt.expirationTime}")
+    private int TOKEN_TIME;
+
+    public String extractUsername(String token){
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public boolean isValid(String token, User user){
+        String username = extractUsername(token);
+        return (username.equals(user.getUsername()) && isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(String token){
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token){
+        return extractClaim(token,Claims::getExpiration);
+    }
+    public <T> T extractClaim(String token, Function<Claims, T> resolver){
+        Claims claims = extractAllClaims(token);
+        return resolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token){
+        return Jwts
+                .parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String generateToken(User user){
+        String token = Jwts
+                .builder()
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + TOKEN_TIME))
+                .signWith(getSignInKey())
+                .compact();
+
+        return token;
+
+    }
+
+    private SecretKey getSignInKey(){
+        byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+}
