@@ -1,22 +1,16 @@
 package com.frz.inkmason.util;
 
-import com.frz.inkmason.dto.auth.EmailDetailsDto;
-import com.frz.inkmason.enums.StatusCode;
 import com.frz.inkmason.model.User;
 import com.frz.inkmason.model.auth.OTP;
-import com.frz.inkmason.model.response.LocalResponse;
-import com.frz.inkmason.model.response.Response;
 import com.frz.inkmason.repository.OTPRepository;
-import com.frz.inkmason.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.Random;
 @RequiredArgsConstructor
 @Service
-public class OTPUtil {
+public class OtpUtil {
     private final OTPRepository otpRepository;
 
     public String generateOTP(User user) {

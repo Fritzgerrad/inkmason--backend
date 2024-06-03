@@ -1,7 +1,7 @@
 package com.frz.inkmason.filter;
 
 import com.frz.inkmason.model.User;
-import com.frz.inkmason.service.JwtService;
+import com.frz.inkmason.util.JwtUtil;
 import com.frz.inkmason.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final UserService userService;
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -34,11 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String username = jwtService.extractUsername(token);
+        String username = jwtUtil.extractUsername(token);
         if(username != null  && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userService.loadUserByUsername(username);
 
-            if(jwtService.isValid(token, (User) userDetails)){
+            if(jwtUtil.isValid(token, (User) userDetails)){
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()
                 );
