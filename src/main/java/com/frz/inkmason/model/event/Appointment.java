@@ -3,12 +3,12 @@ package com.frz.inkmason.model.event;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.frz.inkmason.model.person.Artist;
 import com.frz.inkmason.model.person.Customer;
-import com.frz.inkmason.model.person.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -16,20 +16,18 @@ import java.util.Date;
 @NoArgsConstructor
 @Table
 @Entity
-public class Appointment {
+public class Appointment implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne
     @JsonManagedReference
-    private User user;
-
-    @ManyToOne
-    @JsonManagedReference
+    @JoinColumn(name="artist_id", referencedColumnName = "id", columnDefinition = "BIGINT(20) UNSIGNED")
     private Artist artist;
 
     @ManyToOne
+    @JoinColumn(name="customer_id", referencedColumnName = "id", columnDefinition = "BIGINT(20) UNSIGNED")
     @JsonManagedReference
     private Customer customer;
 

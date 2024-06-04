@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table
 @Entity
-public class Artist {
+public class Artist implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -33,11 +34,10 @@ public class Artist {
     private String name;
     private String gender;
     private double rating;
-    private String dateOfBirth;
     private String image;
     private String location;
 
-    @OneToMany
+    @OneToMany(mappedBy = "artist")
     @JsonBackReference
     private List<Appointment> appointments;
 

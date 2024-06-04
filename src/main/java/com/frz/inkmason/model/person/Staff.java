@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -16,13 +17,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class Staff {
+public class Staff implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true)
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonManagedReference
@@ -33,9 +32,7 @@ public class Staff {
     private Date onBoardDate;
     private Date confirmedDate;
 
-    @OneToMany
+    @OneToMany(mappedBy = "staff")
     @JsonBackReference
     private List<Booking> bookings;
-
-
 }

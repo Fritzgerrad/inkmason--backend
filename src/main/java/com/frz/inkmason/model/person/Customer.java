@@ -8,17 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Customer {
+public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -26,11 +26,11 @@ public class Customer {
     private User user;
     private boolean allowsNewsLetter;
 
-    @OneToMany
+    @OneToMany(mappedBy = "customer")
     @JsonManagedReference
     private List<Booking> bookings;
 
-    @OneToMany
+    @OneToMany(mappedBy = "customer")
     @JsonManagedReference
     private List<Appointment> appointments;
 
