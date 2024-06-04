@@ -31,11 +31,11 @@ public class Artist implements Serializable {
     @JoinColumn()
     private Staff staff;
 
-    private String name;
     private String gender;
     private double rating;
     private String image;
     private String location;
+    private String nickname;
 
     @OneToMany(mappedBy = "artist")
     @JsonBackReference

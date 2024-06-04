@@ -12,4 +12,6 @@ public class ArtistDto {
     private String gender;
     private String image;
     private String location;
+    private String nickname;
+
 }
