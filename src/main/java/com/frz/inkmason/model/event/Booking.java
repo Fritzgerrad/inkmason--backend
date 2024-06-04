@@ -6,24 +6,23 @@ import com.frz.inkmason.model.person.Customer;
 import com.frz.inkmason.model.person.Guest;
 import com.frz.inkmason.model.person.Staff;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name="staff_id", referencedColumnName = "id", columnDefinition = "BIGINT(20) UNSIGNED")
+    @JoinColumn(name="staff_id", referencedColumnName = "id")
     @JsonManagedReference
     private Staff staff;
 

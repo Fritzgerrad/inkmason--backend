@@ -2,8 +2,8 @@ package com.frz.inkmason.controller;
 
 import com.frz.inkmason.dto.auth.CreateUserDto;
 import com.frz.inkmason.enums.StatusCode;
-import com.frz.inkmason.model.response.LocalResponse;
-import com.frz.inkmason.model.response.Response;
+import com.frz.inkmason.response.LocalResponse;
+import com.frz.inkmason.response.Response;
 import com.frz.inkmason.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +21,19 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<Response> register(@RequestBody CreateUserDto userDto){
         Response response = userService.createUser(userDto);
-        if (response.getStatusCode().equals(StatusCode.successful)){
+        if (response.getStatusCode() == StatusCode.successful.getCode()){
             return ResponseEntity.ok(response);
         }
 
-        if (response.getStatusCode().equals(StatusCode.badRequest)){
+        if (response.getStatusCode() == StatusCode.badRequest.getCode()){
             return ResponseEntity.status(400).body(response);
         }
 
-        if (response.getStatusCode().equals(StatusCode.unauthorized)){
+        if (response.getStatusCode() == StatusCode.unauthorized.getCode()){
             return ResponseEntity.status(403).body(response);
         }
 
-        return ResponseEntity.status(404).body(new LocalResponse(StatusCode.unknownError,"An Unknown Error Occurred"));
+        return ResponseEntity.status(404).body(new LocalResponse(StatusCode.unknownError.getCode(),"An Unknown Error Occurred"));
 
     }
 }

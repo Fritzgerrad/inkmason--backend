@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.frz.inkmason.model.person.Artist;
 import com.frz.inkmason.model.person.Customer;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table
@@ -19,15 +18,15 @@ import java.util.Date;
 public class Appointment implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JsonManagedReference
-    @JoinColumn(name="artist_id", referencedColumnName = "id", columnDefinition = "BIGINT(20) UNSIGNED")
+    @JoinColumn(name="artist_id", referencedColumnName = "id")
     private Artist artist;
 
     @ManyToOne
-    @JoinColumn(name="customer_id", referencedColumnName = "id", columnDefinition = "BIGINT(20) UNSIGNED")
+    @JoinColumn(name="customer_id", referencedColumnName = "id")
     @JsonManagedReference
     private Customer customer;
 

@@ -4,7 +4,7 @@ import com.frz.inkmason.dto.auth.LoginUserDto;
 import com.frz.inkmason.dto.auth.OTPDto;
 import com.frz.inkmason.dto.auth.ResetPasswordDTO;
 import com.frz.inkmason.enums.StatusCode;
-import com.frz.inkmason.model.response.Response;
+import com.frz.inkmason.response.Response;
 import com.frz.inkmason.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class AuthenticationController {
     @PutMapping("/verify")
     public ResponseEntity<Response> verifyAccount(@RequestBody OTPDto otpDto){
         Response response = authenticationService.verifyOTP(otpDto);
-        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+        if(response.getStatusCode()== StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
         else{
@@ -37,7 +37,7 @@ public class AuthenticationController {
             @RequestParam(value = "email") String email,
             @RequestParam(value = "otp") String otp){
         Response response = authenticationService.verifyOTP(new OTPDto(email,otp));
-        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+        if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
         else{
@@ -49,7 +49,7 @@ public class AuthenticationController {
     public ResponseEntity<Response> resendOTP(
             @RequestParam(value = "email") String email){
         Response response = authenticationService.sendOTPToCurrentUser(new OTPDto(email,""),"verifyAccount");
-        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+        if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
         else{
@@ -61,7 +61,7 @@ public class AuthenticationController {
     public ResponseEntity<Response> forgotPassword(
             @RequestParam(value = "email") String email){
         Response response = authenticationService.sendOTPToCurrentUser(new OTPDto(email,""),"");
-        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+        if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
         else{
@@ -72,7 +72,7 @@ public class AuthenticationController {
     @PutMapping("/reset-password")
     public ResponseEntity<Response> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
         Response response = authenticationService.passwordReset(resetPasswordDTO);
-        if(response.getStatusCode().equals(StatusCode.badRequest)) {
+        if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
         else{

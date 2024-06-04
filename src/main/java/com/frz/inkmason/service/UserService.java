@@ -2,9 +2,10 @@ package com.frz.inkmason.service;
 
 import com.frz.inkmason.dto.auth.*;
 import com.frz.inkmason.enums.StatusCode;
-import com.frz.inkmason.model.response.AuthResponse;
-import com.frz.inkmason.model.response.LocalResponse;
-import com.frz.inkmason.model.response.Response;
+import com.frz.inkmason.response.AuthResponseBody;
+import com.frz.inkmason.response.BodyResponse;
+import com.frz.inkmason.response.LocalResponse;
+import com.frz.inkmason.response.Response;
 import com.frz.inkmason.enums.Role;
 import com.frz.inkmason.model.person.User;
 import com.frz.inkmason.repository.UserRepository;
@@ -32,14 +33,16 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final OtpUtil otpUtil;
+
+
     public Response createUser(CreateUserDto userDto) {
 
         if (!userRepository.findUserByEmail(userDto.getEmail()).equals(Optional.empty())) {
-            return new LocalResponse(StatusCode.badRequest,"User Already Exists");
+            return new LocalResponse(StatusCode.badRequest.getCode(),"User Already Exists");
         }
 
         if (userDto.getRole().equals(Role.admin) && (userDto.getAdminCreationPass() == null || !userDto.getAdminCreationPass().equals(ADMINCREATIONPASS))) {
-            return new LocalResponse(StatusCode.unauthorized,"You don't have Permission to create an admin");
+            return new LocalResponse(StatusCode.unauthorized.getCode(),"You don't have Permission to create an admin");
         }
 
         User user = User.builder()
@@ -61,6 +64,9 @@ public class UserService {
         EmailDetailsDto emailDetailsDto = emailService.generateRegistrationOTPMail(user,otp);
         emailService.sendEmail(emailDetailsDto);
 
-        return new AuthResponse(token, user.getFirstname(), user.getRole(), false, StatusCode.successful, "Account Created Successfully", user.getId());
+        return new BodyResponse<AuthResponseBody>( StatusCode.successful.getCode(), "Account Created Successfully",
+                new  AuthResponseBody(token, user.getFirstname(), user.getRole(), false,  user.getId()));
     }
 }
+
+
