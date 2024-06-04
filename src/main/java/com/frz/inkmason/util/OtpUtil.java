@@ -1,6 +1,6 @@
 package com.frz.inkmason.util;
 
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import com.frz.inkmason.model.auth.OTP;
 import com.frz.inkmason.repository.OTPRepository;
 import lombok.RequiredArgsConstructor;

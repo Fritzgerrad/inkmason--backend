@@ -1,7 +1,7 @@
 package com.frz.inkmason.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

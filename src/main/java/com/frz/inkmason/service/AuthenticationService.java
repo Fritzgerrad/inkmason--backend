@@ -6,7 +6,7 @@ import com.frz.inkmason.model.response.AuthResponse;
 import com.frz.inkmason.model.response.LocalResponse;
 import com.frz.inkmason.model.response.Response;
 import com.frz.inkmason.enums.Role;
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import com.frz.inkmason.repository.UserRepository;
 import com.frz.inkmason.util.JwtUtil;
 import com.frz.inkmason.util.OtpUtil;

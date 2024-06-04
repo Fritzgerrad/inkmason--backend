@@ -1,6 +1,6 @@
 package com.frz.inkmason.filter;
 
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import com.frz.inkmason.util.JwtUtil;
 import com.frz.inkmason.service.UserService;
 import jakarta.servlet.FilterChain;

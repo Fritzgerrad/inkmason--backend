@@ -1,5 +1,5 @@
 package com.frz.inkmason.util;
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

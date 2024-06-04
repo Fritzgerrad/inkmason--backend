@@ -1,4 +1,4 @@
-package com.frz.inkmason.model;
+package com.frz.inkmason.model.person;
 
 import com.frz.inkmason.enums.Role;
 import jakarta.persistence.*;
@@ -31,7 +31,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean verified;
-    //private boolean allowsNewsLetter;
     private Date createdAt;
     private Date updatedAt;
 
