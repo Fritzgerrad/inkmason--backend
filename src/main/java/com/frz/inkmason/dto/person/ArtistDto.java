@@ -13,4 +13,5 @@ public class ArtistDto {
     private String location;
     private String nickname;
     private long userId;
+    private String token;
 }

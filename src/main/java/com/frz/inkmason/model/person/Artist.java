@@ -30,6 +30,7 @@ public class Artist implements Serializable {
     @JsonManagedReference
     @JoinColumn()
     private Staff staff;
+
     private String gender;
     private double rating;
     private String image;

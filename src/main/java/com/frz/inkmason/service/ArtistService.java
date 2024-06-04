@@ -13,12 +13,14 @@ import com.frz.inkmason.response.Response;
 import com.frz.inkmason.repository.ArtistRepository;
 import com.frz.inkmason.repository.StaffRepository;
 import com.frz.inkmason.repository.UserRepository;
+import com.frz.inkmason.util.JwtUtil;
 import com.frz.inkmason.util.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class ArtistService {
     private final UserDetailService userService;
     private final StaffRepository staffRepository;
     private final AuthenticationService authenticationService;
+    private final JwtUtil jwtUtil;
 
     public Response newArtist(ArtistDto artistDto){
         User user  = userRepository.findUserById(artistDto.getUserId());
@@ -56,11 +59,33 @@ public class ArtistService {
     }
 
     public Response updateArtist(ArtistDto artistDto){
-        User user = userRepository.findUserById(artistDto.getUserId());
-        if(user == null){
+        String token = artistDto.getToken();
+        if(token == null || !token.startsWith("Bearer")){
+            return new LocalResponse(StatusCode.unauthorized.getCode(),  "No Authorization Token");
+        }
+        String username = jwtUtil.extractUsername(token);
+
+        Optional <User> userOptional = userRepository.findUserByEmail(username);
+
+        if(userOptional.isEmpty()){
             return new LocalResponse(StatusCode.badRequest.getCode(), "User not Found");
         }
+        User user = userOptional.get();
+
+        return edit(artistDto, user);
+    }
+
+    public Response adminUpdateArtist(ArtistDto artistDto){
+        User user = userRepository.findUserById(artistDto.getUserId());
+        if(user == null){
+            return new LocalResponse(StatusCode.unknownError.getCode(),"An Unknown Error Occurred");
+        }
+        return edit(artistDto, user);
+    }
+
+    private Response edit(ArtistDto artistDto, User user) {
         Artist artist = artistRepository.findArtistByUser(user);
+
         if(artist == null){
             return new LocalResponse(StatusCode.badRequest.getCode(), "Artist not Found");
         }
@@ -72,15 +97,18 @@ public class ArtistService {
         return new BodyResponse<>(StatusCode.successful.getCode(), "Artist Successfully Updated",savedArtist);
     }
 
-    public Response deleteArtist(ArtistDto artistDto){
-        User user = userRepository.findUserById(artistDto.getUserId());
+    public Response deleteArtist(Long userId){
+        User user = userRepository.findUserById(userId);
         Artist artist = artistRepository.findArtistByUser(user);
+        Staff  staff = staffRepository.findByArtist(artist);
         artistRepository.delete(artist);
+        staffRepository.delete(staff);
+        userRepository.delete(user);
         return new LocalResponse(StatusCode.successful.getCode(),"Delete Successful");
     }
 
-    public Response getArtist(ArtistDto artistDto){
-        User user = userRepository.findUserById(artistDto.getUserId());
+    public Response getArtist(Long userId){
+        User user = userRepository.findUserById(userId);
         if(user == null){
             return new LocalResponse(StatusCode.badRequest.getCode(),"Artist not Found");
         }
@@ -94,7 +122,7 @@ public class ArtistService {
         return  new BodyResponse<>(StatusCode.successful.getCode(), "Successful",artist);
     }
 
-    public Response getAllArtist(){
+    public Response getAllArtists(){
         List<Artist> artists = artistRepository.findAll();
         return new BodyResponse<>(StatusCode.successful.getCode(), "Successful",artists);
     }
