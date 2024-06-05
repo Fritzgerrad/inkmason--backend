@@ -1,7 +1,7 @@
 package com.frz.inkmason.dto.event;
 
 import com.frz.inkmason.enums.BookingMode;
-import com.frz.inkmason.model.person.Staff;
+import com.frz.inkmason.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +17,9 @@ public class BookingDto {
     private Date bookingDate;
     private String contactInformation;
     private String bookingTime;
-    private boolean guest;
+    private String email;
+    private String bookerName;
+    private Date loginTime;
+    private Role bookerRole;
+
 }

@@ -37,12 +37,33 @@ public class UserService {
 
     public Response createUser(CreateUserDto userDto) {
 
-        if (!userRepository.findUserByEmail(userDto.getEmail()).equals(Optional.empty())) {
+        if (userDto.getRole().equals(Role.admin) && (userDto.getAdminCreationPass() == null || !userDto.getAdminCreationPass().equals(ADMINCREATIONPASS))) {
+            return new LocalResponse(StatusCode.unauthorized.getCode(),"You don't have Permission to create an admin");
+        }
+
+        User user = newUser(userDto);
+
+        if (user == null) {
             return new LocalResponse(StatusCode.badRequest.getCode(),"User Already Exists");
         }
 
-        if (userDto.getRole().equals(Role.admin) && (userDto.getAdminCreationPass() == null || !userDto.getAdminCreationPass().equals(ADMINCREATIONPASS))) {
-            return new LocalResponse(StatusCode.unauthorized.getCode(),"You don't have Permission to create an admin");
+        handleUser2FA(user);
+
+        String token = jwtUtil.generateToken(user);
+
+        return new BodyResponse<>(StatusCode.successful.getCode(), "Account Created Successfully",
+                new AuthResponseBody(token, user.getFirstname(), user.getRole(), false, user.getId()));
+    }
+
+    public void handleUser2FA(User user) {
+        String otp = otpUtil.generateOTP(user);
+        EmailDetailsDto emailDetailsDto = emailService.generateRegistrationOTPMail(user, otp);
+        emailService.sendEmail(emailDetailsDto);
+    }
+
+    public User newUser(CreateUserDto userDto){
+        if (!userRepository.findUserByEmail(userDto.getEmail()).equals(Optional.empty())) {
+            return null;
         }
 
         User user = User.builder()
@@ -57,16 +78,53 @@ public class UserService {
                 .verified(false)
                 .build();
 
-        user = userRepository.save(user);
-        String otp = otpUtil.generateOTP(user);
-
-        String token = jwtUtil.generateToken(user);
-        EmailDetailsDto emailDetailsDto = emailService.generateRegistrationOTPMail(user,otp);
-        emailService.sendEmail(emailDetailsDto);
-
-        return new BodyResponse<AuthResponseBody>( StatusCode.successful.getCode(), "Account Created Successfully",
-                new  AuthResponseBody(token, user.getFirstname(), user.getRole(), false,  user.getId()));
+        return userRepository.save(user);
     }
+
+    public User edit(CreateUserDto createUserDto, String token) {
+        BodyResponse<User> response =  jwtUtil.getUserFromToken(token);
+        User user = response.getData();
+        user.setFirstname(createUserDto.getFirstname());
+        user.setLastname(createUserDto.getLastname());
+        user.setPhone(createUserDto.getPhone());
+        return userRepository.save(user);
+    }
+
+    public Response delete(String token) {
+        BodyResponse<User> response =  jwtUtil.getUserFromToken(token);
+        User user = response.getData();
+        userRepository.delete(user);
+        return new LocalResponse(StatusCode.successful.getCode(),"User Deleted Successfully");
+    }
+
+    public Response updatePassword(String token, String oldPassword, String newPassword) {
+        BodyResponse<User> response =  jwtUtil.getUserFromToken(token);
+        User user = response.getData();
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return new LocalResponse(StatusCode.badRequest.getCode(),"Old Password does not match");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return new LocalResponse(StatusCode.successful.getCode(),"Password Updated Successfully");
+    }
+
+    public Response updateEmail(String token, String email) {
+        BodyResponse<User> response =  jwtUtil.getUserFromToken(token);
+        if(response.getData() == null){
+            return new LocalResponse(StatusCode.badRequest.getCode(),"Email does not exist");
+        }
+
+        User user = response.getData();
+        user.setEmail(email);
+        userRepository.save(user);
+        handleUser2FA(user);
+
+        return new LocalResponse(StatusCode.successful.getCode(),"Email Updated Successfully");
+
+    }
+
 }
+
+
 
 

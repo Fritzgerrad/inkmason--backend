@@ -1,11 +1,11 @@
 package com.frz.inkmason.dto.person;
 
 import com.frz.inkmason.dto.auth.CreateUserDto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerDto extends CreateUserDto {

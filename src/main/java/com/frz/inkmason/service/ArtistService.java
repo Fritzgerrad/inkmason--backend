@@ -3,9 +3,11 @@ package com.frz.inkmason.service;
 import com.frz.inkmason.dto.person.ArtistDto;
 import com.frz.inkmason.enums.Role;
 import com.frz.inkmason.enums.StatusCode;
+import com.frz.inkmason.model.Rating;
 import com.frz.inkmason.model.person.Artist;
 import com.frz.inkmason.model.person.Staff;
 import com.frz.inkmason.model.person.User;
+import com.frz.inkmason.repository.RatingRepository;
 import com.frz.inkmason.response.ArtistResponseBody;
 import com.frz.inkmason.response.BodyResponse;
 import com.frz.inkmason.response.LocalResponse;
@@ -14,13 +16,11 @@ import com.frz.inkmason.repository.ArtistRepository;
 import com.frz.inkmason.repository.StaffRepository;
 import com.frz.inkmason.repository.UserRepository;
 import com.frz.inkmason.util.JwtUtil;
-import com.frz.inkmason.util.UserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -28,10 +28,9 @@ import java.util.Optional;
 public class ArtistService {
     private final UserRepository userRepository;
     private final ArtistRepository artistRepository;
-    private final UserDetailService userService;
     private final StaffRepository staffRepository;
-    private final AuthenticationService authenticationService;
     private final JwtUtil jwtUtil;
+    private final RatingRepository ratingRepository;
 
     public Response newArtist(ArtistDto artistDto){
         User user  = userRepository.findUserById(artistDto.getUserId());
@@ -41,6 +40,7 @@ public class ArtistService {
 
         Staff staff = new Staff();
         staff.setRole(Role.artist);
+        staff.setUser(user);
         staff.setOnBoardDate(new Date());
         Staff savedStaff = staffRepository.save(staff);
 
@@ -54,25 +54,19 @@ public class ArtistService {
                 .build();
 
         Artist savedArtist = artistRepository.save(artist);
-        return new BodyResponse<>(StatusCode.successful.getCode() ,"Artist Successfully Created",
-                new ArtistResponseBody(savedArtist.getNickname(), savedArtist.getGender(), savedArtist.getRating(), savedArtist.getImage(), savedArtist.getLocation()));
+        return new BodyResponse<>(StatusCode.successful.getCode() ,"Artist Successfully Created", savedArtist);
     }
 
-    public Response updateArtist(ArtistDto artistDto){
-        String token = artistDto.getToken();
-        if(token == null || !token.startsWith("Bearer")){
-            return new LocalResponse(StatusCode.unauthorized.getCode(),  "No Authorization Token");
+    public Response updateArtist(ArtistDto artistDto, String token){
+
+        BodyResponse<User> response =  jwtUtil.getUserFromToken(token);
+        if(response.getStatusCode() == StatusCode.successful.getCode()){
+            return edit(artistDto, response.getData());
         }
-        String username = jwtUtil.extractUsername(token);
-
-        Optional <User> userOptional = userRepository.findUserByEmail(username);
-
-        if(userOptional.isEmpty()){
-            return new LocalResponse(StatusCode.badRequest.getCode(), "User not Found");
+        else {
+            return response;
         }
-        User user = userOptional.get();
 
-        return edit(artistDto, user);
     }
 
     public Response adminUpdateArtist(ArtistDto artistDto){
@@ -100,7 +94,7 @@ public class ArtistService {
     public Response deleteArtist(Long userId){
         User user = userRepository.findUserById(userId);
         Artist artist = artistRepository.findArtistByUser(user);
-        Staff  staff = staffRepository.findByArtist(artist);
+        Staff  staff = staffRepository.findByUser(user);
         artistRepository.delete(artist);
         staffRepository.delete(staff);
         userRepository.delete(user);
@@ -117,7 +111,7 @@ public class ArtistService {
                         .nickname(artist.getNickname())
                                 .gender(artist.getGender())
                                         .location(artist.getLocation())
-                                                .rating(artist.getRating())
+                                                .rating(artist.getAverageRating())
                 .build();
         return  new BodyResponse<>(StatusCode.successful.getCode(), "Successful",artist);
     }
@@ -125,6 +119,13 @@ public class ArtistService {
     public Response getAllArtists(){
         List<Artist> artists = artistRepository.findAll();
         return new BodyResponse<>(StatusCode.successful.getCode(), "Successful",artists);
+    }
+
+    public Response getCustomerRatings(String token){
+        User user  = jwtUtil.getUserFromToken(token).getData();
+        Artist artist = artistRepository.findArtistByUser(user);
+        List<Rating> customerRatings = ratingRepository.findByArtist(artist);
+        return new BodyResponse<>(StatusCode.successful.getCode(), "Successful",customerRatings);
     }
 
 

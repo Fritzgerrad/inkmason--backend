@@ -41,7 +41,7 @@ public class AuthenticationService {
         User user = userRepository.findUserByEmail(loginUserDto.getIdentifier()).orElseThrow();
         String token = jwtUtil.generateToken(user);
 
-        return new BodyResponse<AuthResponseBody>( StatusCode.successful.getCode(), "Login Successful",
+        return new BodyResponse<>( StatusCode.successful.getCode(), "Login Successful",
                 new  AuthResponseBody(token, user.getFirstname(), user.getRole(), user.isVerified(),  user.getId()));
     }
 

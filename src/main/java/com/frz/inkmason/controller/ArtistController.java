@@ -4,41 +4,52 @@ import com.frz.inkmason.dto.person.ArtistDto;
 import com.frz.inkmason.response.Response;
 import com.frz.inkmason.service.ArtistService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/artist")
 public class ArtistController {
     public final ArtistService artistService;
+    public final ResponseMaker responseMaker;
 
     @PostMapping
-    public Response create(@RequestBody ArtistDto artistDto){
-        return artistService.newArtist(artistDto);
+    public ResponseEntity<Response> create(@RequestBody ArtistDto artistDto){
+        return responseMaker.getResponse(artistService.newArtist(artistDto));
     }
 
     @GetMapping("/{userId}")
-    public Response getArtist(@PathVariable Long userId){
-        return artistService.getArtist(userId);
+    public ResponseEntity<Response> getArtist(@PathVariable Long userId){
+        return  responseMaker.getResponse(artistService.getArtist(userId));
     }
 
     @GetMapping("/all")
-    public Response getAllArtist(){
-        return artistService.getAllArtists();
+    public ResponseEntity<Response> getAllArtist(){
+        return responseMaker.getResponse(artistService.getAllArtists());
     }
 
     @DeleteMapping("/admin/{userId}")
-    public Response delete(@PathVariable Long userId){
-        return artistService.deleteArtist(userId);
+    public ResponseEntity<Response> delete(@PathVariable Long userId){
+        return responseMaker.getResponse(artistService.deleteArtist(userId));
     }
 
     @PutMapping
-    public Response update(@RequestBody ArtistDto artistDto){
-        return artistService.updateArtist(artistDto);
+    public ResponseEntity<Response> update(@RequestBody ArtistDto artistDto,
+                           @RequestHeader("Authorization") String token){
+        return responseMaker.getResponse(artistService.updateArtist(artistDto, token));
     }
 
     @PutMapping("/admin")
-    public Response updateByAdmin(@RequestBody ArtistDto artistDto){
-        return artistService.adminUpdateArtist(artistDto);
+    public ResponseEntity<Response> updateByAdmin(@RequestBody ArtistDto artistDto){
+        return responseMaker.getResponse(artistService.adminUpdateArtist(artistDto));
     }
+
+    @GetMapping("/ratings")
+    public ResponseEntity<Response> getRatings(@RequestHeader("Authorization") String token){
+        return responseMaker.getResponse(artistService.getCustomerRatings(token));
+    }
+
+
 }

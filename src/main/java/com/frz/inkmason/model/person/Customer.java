@@ -1,8 +1,9 @@
 package com.frz.inkmason.model.person;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.frz.inkmason.model.Rating;
 import com.frz.inkmason.model.event.Appointment;
-import com.frz.inkmason.model.event.Booking;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
+
 public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,14 +26,16 @@ public class Customer implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonManagedReference
     private User user;
+
     private boolean allowsNewsLetter;
 
     @OneToMany(mappedBy = "customer")
-    @JsonManagedReference
-    private List<Booking> bookings;
+    @JsonBackReference
+    private List<Appointment> appointments;
+
 
     @OneToMany(mappedBy = "customer")
-    @JsonManagedReference
-    private List<Appointment> appointments;
+    @JsonBackReference
+    private List<Rating> ratings;
 
 }

@@ -27,11 +27,6 @@ public class Staff implements Serializable {
     @JsonManagedReference
     private User user;
 
-    @OneToOne
-    @JoinColumn
-    @JsonBackReference
-    private Artist artist;
-
     private Role role;
     private Date onBoardDate;
     private Date confirmedDate;

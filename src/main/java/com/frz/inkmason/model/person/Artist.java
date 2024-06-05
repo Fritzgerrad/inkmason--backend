@@ -32,7 +32,7 @@ public class Artist implements Serializable {
     private Staff staff;
 
     private String gender;
-    private double rating;
+    private double averageRating;
     private String image;
     private String location;
     private String nickname;

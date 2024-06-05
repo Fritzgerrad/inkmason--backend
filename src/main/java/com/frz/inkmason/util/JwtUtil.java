@@ -1,16 +1,24 @@
 package com.frz.inkmason.util;
+import com.frz.inkmason.enums.StatusCode;
 import com.frz.inkmason.model.person.User;
+import com.frz.inkmason.repository.UserRepository;
+import com.frz.inkmason.response.BodyResponse;
+import com.frz.inkmason.response.LocalResponse;
+import com.frz.inkmason.response.Response;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.Function;
 
+@RequiredArgsConstructor
 @Service
 public class JwtUtil {
     @Value("${jwt.secret}")
@@ -18,6 +26,8 @@ public class JwtUtil {
 
     @Value("${jwt.expirationTime}")
     private int TOKEN_TIME;
+
+    private UserRepository userRepository;
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
@@ -50,7 +60,8 @@ public class JwtUtil {
     }
 
     public String generateToken(User user){
-        String token = Jwts
+
+        return Jwts
                 .builder()
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -58,13 +69,27 @@ public class JwtUtil {
                 .signWith(getSignInKey())
                 .compact();
 
-        return token;
-
     }
 
     private SecretKey getSignInKey(){
         byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public BodyResponse<User> getUserFromToken(String token){
+        if(token == null || !token.startsWith("Bearer")){
+            return new BodyResponse<>(StatusCode.unauthorized.getCode(),  "No Authorization Token",null);
+        }
+
+        String username = extractUsername(token.substring(7));
+
+        User user = userRepository.findUserByEmail(username).orElse(null);
+        if(user == null){
+            return new BodyResponse<>(StatusCode.badRequest.getCode(), "User not Found",null);
+        }
+
+        return new BodyResponse<>(StatusCode.successful.getCode(), "ok"
+        ,user);
     }
 
 }

@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
