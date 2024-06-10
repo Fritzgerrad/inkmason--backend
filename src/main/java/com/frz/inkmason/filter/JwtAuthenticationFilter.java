@@ -1,8 +1,8 @@
 package com.frz.inkmason.filter;
 
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import com.frz.inkmason.util.JwtUtil;
-import com.frz.inkmason.service.UserService;
+import com.frz.inkmason.util.UserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final UserService userService;
+    private final UserDetailService userService;
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

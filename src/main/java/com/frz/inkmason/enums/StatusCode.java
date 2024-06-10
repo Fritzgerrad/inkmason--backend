@@ -1,9 +1,12 @@
 package com.frz.inkmason.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum StatusCode {
     unauthorized(91),
     badRequest(92),
-    successful(00),
+    successful(0),
     unknownError(99);
 
 
@@ -13,7 +16,4 @@ public enum StatusCode {
         this.code = code;
     }
 
-    public int getCode() {
-        return code;
-    }
 }

@@ -1,4 +1,4 @@
-package com.frz.inkmason.model.response;
+package com.frz.inkmason.response;
 
 import com.frz.inkmason.enums.Role;
 import com.frz.inkmason.enums.StatusCode;
@@ -9,13 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AuthResponse implements Response{
+public class AuthResponseBody{
     private String token;
     private String firstname;
     private Role role;
     private boolean isVerified;
-    private StatusCode statusCode;
-    private String statusMessage;
     private Long userId;
 
 }

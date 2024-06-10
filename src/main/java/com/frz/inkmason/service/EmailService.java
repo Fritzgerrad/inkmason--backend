@@ -1,7 +1,7 @@
 package com.frz.inkmason.service;
 
 import com.frz.inkmason.dto.auth.EmailDetailsDto;
-import com.frz.inkmason.model.User;
+import com.frz.inkmason.model.person.User;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,5 @@ public class EmailService {
                 user.getEmail(), message, "Change your InkhMason Account Password"
         );
     }
-
 
 }

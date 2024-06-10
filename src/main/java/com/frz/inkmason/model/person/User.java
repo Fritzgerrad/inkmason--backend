@@ -1,11 +1,8 @@
-package com.frz.inkmason.model;
+package com.frz.inkmason.model.person;
 
 import com.frz.inkmason.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,7 +10,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -22,16 +20,16 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String email;
     private String firstname;
     private String lastname;
     private String password;
     private String phone;
+    private Date dateOfBirth;
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean verified;
-    //private boolean allowsNewsLetter;
     private Date createdAt;
     private Date updatedAt;
 
