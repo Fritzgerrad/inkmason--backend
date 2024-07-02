@@ -20,6 +20,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<Response> register(@RequestBody CreateUserDto userDto){
+        System.out.println(userDto);
         Response response = userService.createUser(userDto);
         if (response.getStatusCode() == StatusCode.successful.getCode()){
             return ResponseEntity.ok(response);

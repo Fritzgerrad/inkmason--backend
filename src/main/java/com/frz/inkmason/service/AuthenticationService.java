@@ -34,11 +34,11 @@ public class AuthenticationService {
     public Response authenticate(LoginUserDto loginUserDto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginUserDto.getIdentifier(),
+                        loginUserDto.getEmail(),
                         loginUserDto.getPassword()
                 )
         );
-        User user = userRepository.findUserByEmail(loginUserDto.getIdentifier()).orElseThrow();
+        User user = userRepository.findUserByEmail(loginUserDto.getEmail()).orElseThrow();
         String token = jwtUtil.generateToken(user);
 
         return new BodyResponse<>( StatusCode.successful.getCode(), "Login Successful",
@@ -47,19 +47,22 @@ public class AuthenticationService {
 
     public Response verifyOTP(OTPDto otpDto){
         Response response = new LocalResponse();
-        Optional <User> userOptional = userRepository.findUserByEmail(otpDto.getEmail());
+
+        Long userId = Long.parseLong(otpDto.getIdentifier());
+        Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()){
             return new LocalResponse(StatusCode.badRequest.getCode(), "User not Found");
         }
         User user = userOptional.get();
-        int otpStatus = otpUtil.validateOTP(user,otpDto.getOtp());
+        int otpStatus = otpUtil.validateOTP(user,otpDto.getToken());
         switch (otpStatus){
             case 0:
                 user.setVerified(true);
-                userRepository.save(user);
-                response.setStatusCode(StatusCode.successful.getCode());
-                response.setStatusMessage("OTP Successfully Validated");
-                break;
+                user = userRepository.save(user);
+                String token = jwtUtil.generateToken(user);
+
+                return new BodyResponse<>(StatusCode.successful.getCode(), "Successful",
+                        new AuthResponseBody(token, user.getFirstname(), user.getRole(), user.isVerified(), user.getId()));
             case 1:
                 response.setStatusCode(StatusCode.badRequest.getCode());
                 response.setStatusMessage("OTP has Expired");
@@ -77,25 +80,39 @@ public class AuthenticationService {
         return response;
     }
 
-    public Response sendOTPToCurrentUser(OTPDto otpDto,String action){
-        Optional <User> user = userRepository.findUserByEmail(otpDto.getEmail());
-        if(user.isEmpty()){
+    public Response resendOTP(String identifier){
+        Long userId = Long.parseLong(identifier);
+        Optional<User> userOptional = userRepository.findById(userId);
+        return userOptional.map(user -> sendOTPToCurrentUser("verifyAccount", user.getEmail())).orElse(null);
+    }
+
+    public Response sendOTPToCurrentUser(String action,String email){
+        Optional <User> userOptional = userRepository.findUserByEmail(email);
+
+        if(userOptional.isEmpty()){
             return new LocalResponse(StatusCode.badRequest.getCode(), "User does not exist");
         }
-        String otp = otpUtil.regenerateOTP(user.get());
+        User user = userOptional.get();
+        String otp = otpUtil.regenerateOTP(user);
         EmailDetailsDto emailDetailsDto;
         if (action.equals("verifyAccount")){
-            emailDetailsDto = emailService.generateRegistrationOTPMail(user.get(),otp);
+            emailDetailsDto = emailService.generateRegistrationOTPMail(user,otp);
         }
         else{
-            emailDetailsDto = emailService.generatePasswordResetOTPMail(user.get(),otp);
+            emailDetailsDto = emailService.generatePasswordResetOTPMail(user,otp);
         }
         emailService.sendEmail(emailDetailsDto);
-        return new LocalResponse(StatusCode.successful.getCode(),"OTP Successfully Resent");
+        return new BodyResponse<>(StatusCode.successful.getCode(),"OTP Successfully Resent",user.getId());
     }
 
     public Response passwordReset(ResetPasswordDTO resetPasswordDTO){
-        Optional<User> userOptional = userRepository.findUserByEmail(resetPasswordDTO.getEmail());
+        Long userId = Long.parseLong(resetPasswordDTO.getIdentifier());
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if(!resetPasswordDTO.getPassword().equals(resetPasswordDTO.getConfirmPassword())){
+            return new LocalResponse(StatusCode.badRequest.getCode(), "Passwords don't match");
+        }
+
         if(userOptional.isEmpty()){
             return new LocalResponse(StatusCode.badRequest.getCode(), "User does not exist");
         }

@@ -15,11 +15,12 @@ public class BookingController {
     private final BookingService bookingService;
     private final ResponseMaker responseMaker;
 
-    @PostMapping
+    @PostMapping("/new")
     public ResponseEntity<Response> createBooking(
             @RequestBody BookingDto bookingDto,
             @RequestHeader("Authorization") String token
     ){
+        System.out.println(bookingDto.toString());
         return responseMaker.getResponse(bookingService.createBooking(bookingDto,token));
     }
 

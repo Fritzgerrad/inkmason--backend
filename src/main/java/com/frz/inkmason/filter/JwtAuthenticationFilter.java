@@ -32,6 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
+        //System.out.println(request.getQueryString());
+        //System.out.println(request.getContextPath());
+        //System.out.println(request.getPathInfo());
+        //System.out.println(request.getRequestURI());
+
+        if(request.getRequestURI().startsWith("/inkmason/auth")){
+            filterChain.doFilter(request,response);
+            return;
+        }
+
 
         String token = authHeader.substring(7);
         String username = jwtUtil.extractUsername(token);

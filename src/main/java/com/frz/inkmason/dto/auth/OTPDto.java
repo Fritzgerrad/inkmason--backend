@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OTPDto {
-    private String email;
-    private String otp;
+    private String identifier;
+    private String token;
 }

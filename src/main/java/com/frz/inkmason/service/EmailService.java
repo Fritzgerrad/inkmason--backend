@@ -39,7 +39,7 @@ public class EmailService {
 
     public EmailDetailsDto generateRegistrationOTPMail(User user, String otp) {
         String name = user.getFirstname();
-        String link = "http://localhost:8085/inkmason/auth/verify?email="+ user.getEmail()+"&otp="+ otp;
+        String link = "http://localhost:8085/inkmason/auth/verify?identifier="+ user.getId()+"&otp="+ otp;
         String message =  String.format("Dear %s,%n%nYou are receiving this email because you registered with InkhMason %n%n Use the One Time Password: %s%n%n or click the link %s to complete your registration%n%nThank you!", name, otp,link);
         return new EmailDetailsDto(
                 user.getEmail(), message, "Verify your InkMason Account"

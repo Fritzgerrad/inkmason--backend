@@ -35,6 +35,7 @@ public class BookingService {
                 .bookingDate(bookingDto.getBookingDate())
                 .createdDate(new Date())
                 .mode(bookingDto.getMode())
+                .platform(bookingDto.getPlatform())
                 .contactInformation(bookingDto.getContactInformation())
                 .bookingTime(bookingDto.getBookingTime())
                 .build();
@@ -45,7 +46,6 @@ public class BookingService {
             Guest guest = Guest.builder()
                     .name(bookingDto.getBookerName())
                     .email(bookingDto.getEmail())
-                    .logInTime(bookingDto.getLoginTime())
                     .build();
                     Guest savedGuest = guestRepository.save(guest);
                     booking.setBookerId(savedGuest.getId());
