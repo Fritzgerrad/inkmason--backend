@@ -85,12 +85,30 @@ public class CustomerService {
         return new LocalResponse(StatusCode.successful.getCode(), "Successful");
     }
 
-    public Response getBookings(String token){
+    public Response getCompletedBookings(String token){
         BodyResponse<User> response = jwtUtil.getUserFromToken(token);
         if(response.getStatusCode() == StatusCode.successful.getCode()) {
             User user = response.getData();
-            List<Booking> bookings = bookingRepository.findByBookerId(user.getId());
+            List<Booking> bookings = bookingRepository.findByBookerIdAndCompleted(user.getId(),true);
             return new BodyResponse<>(StatusCode.successful.getCode(), "    All bookings fetched successfully", bookings);
+        }
+        else{
+            return response;
+        }
+    }
+
+    public Response getOngoingBookings(String token){
+        BodyResponse<User> response = jwtUtil.getUserFromToken(token);
+        if(response.getStatusCode() == StatusCode.successful.getCode()) {
+            User user = response.getData();
+            List<Booking> bookings = bookingRepository.findByBookerIdAndCompleted(user.getId(),false);
+            if(bookings.size() == 1){
+                return new BodyResponse<>(StatusCode.successful.getCode(), "    All bookings fetched successfully", bookings.get(0));
+            }
+            else{
+                return new BodyResponse<>(StatusCode.successful.getCode(), "    All bookings fetched successfully", bookings);
+
+            }
         }
         else{
             return response;
@@ -126,6 +144,5 @@ public class CustomerService {
        artistRepository.save(artist);
        return new LocalResponse(StatusCode.successful.getCode(), "Successful");
    }
-
 
 }

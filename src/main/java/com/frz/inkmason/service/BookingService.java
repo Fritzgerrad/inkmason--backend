@@ -9,6 +9,7 @@ import com.frz.inkmason.model.person.Guest;
 import com.frz.inkmason.model.person.User;
 import com.frz.inkmason.repository.*;
 import com.frz.inkmason.response.BodyResponse;
+import com.frz.inkmason.response.LocalResponse;
 import com.frz.inkmason.response.Response;
 import com.frz.inkmason.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class BookingService {
                 .platform(bookingDto.getPlatform())
                 .contactInformation(bookingDto.getContactInformation())
                 .bookingTime(bookingDto.getBookingTime())
+                .completed(false)
                 .build();
         EmailDetailsDto emailDetailsDto = new EmailDetailsDto();
 
@@ -54,6 +56,12 @@ public class BookingService {
         else{
             BodyResponse<User> response =  jwtUtil.getUserFromToken(token);
             User user = response.getData();
+
+            List<Booking> pendingBookings = bookingRepository.findByBookerIdAndCompleted(user.getId(),false);
+            if (!pendingBookings.isEmpty()) {
+                return new LocalResponse(StatusCode.badRequest.getCode(), "User has ongoing Booking");
+            }
+
             booking.setBookerRole(Role.customer);
             booking.setBookerName(user.getFirstname() + " " + user.getLastname());
             booking.setBookerId(user.getId());
@@ -77,6 +85,8 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id).orElse(null);
         return new BodyResponse<>(StatusCode.successful.getCode(), "Successful",booking);
     }
+
+    public Response deleteBooking
 
 
 }

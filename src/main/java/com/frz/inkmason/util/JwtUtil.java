@@ -27,7 +27,7 @@ public class JwtUtil {
     @Value("${jwt.expirationTime}")
     private int TOKEN_TIME;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);

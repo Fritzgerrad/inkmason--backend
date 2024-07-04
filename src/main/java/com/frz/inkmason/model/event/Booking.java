@@ -27,15 +27,23 @@ public class Booking implements Serializable {
     @JsonManagedReference
     private Staff staff;
 
+    @Enumerated(EnumType.STRING)
     private Role bookerRole;
     private Long bookerId;
     private String bookerName;
-    private BookingMode mode;
+
+    //@Enumerated(EnumType.STRING)
+//    private BookingMode mode;
+    private String mode;
     private Date createdDate;
     private Date bookingDate;
     private String contactInformation;
     private String bookingTime;
-    private BookingPlatform platform;
+
+    //@Enumerated(EnumType.STRING)
+    //private BookingPlatform platform;
+    private String platform;
+    private boolean completed;
 
 
 }

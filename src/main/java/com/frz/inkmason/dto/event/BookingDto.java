@@ -12,8 +12,13 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingDto {
-    private BookingPlatform platform;
-    private BookingMode mode;
+//    private BookingPlatform platform;
+      private String platform;
+
+
+//    private BookingMode mode;
+    private String mode;
+
     private Date bookingDate;
     private String contactInformation;
     private String bookingTime;
