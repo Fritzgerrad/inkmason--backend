@@ -39,11 +39,6 @@ public class CustomerController {
         return responseMaker.getResponse(customerService.updateCustomer(customerDto,token));
     }
 
-    @GetMapping("/bookings")
-    public ResponseEntity<Response> getBookings(@RequestHeader("Authorization") String token){
-        return responseMaker.getResponse(customerService.getBookings(token));
-    }
-
     @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Response> deleteCustomer(@PathVariable Long id){
         return responseMaker.getResponse(customerService.deleteCustomer(id));

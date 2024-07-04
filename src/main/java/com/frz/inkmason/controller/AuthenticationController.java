@@ -21,7 +21,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticate(loginUserDto));
     }
 
-    @PutMapping("/verify")
+    @PostMapping("/verify")
     public ResponseEntity<Response> verifyAccount(@RequestBody OTPDto otpDto){
         Response response = authenticationService.verifyOTP(otpDto);
         if(response.getStatusCode()== StatusCode.badRequest.getCode()) {
@@ -34,9 +34,9 @@ public class AuthenticationController {
 
     @GetMapping("/verify")
     public ResponseEntity<Response> verifyAccount(
-            @RequestParam(value = "email") String email,
+            @RequestParam(value = "identifier") String identifier,
             @RequestParam(value = "otp") String otp){
-        Response response = authenticationService.verifyOTP(new OTPDto(email,otp));
+        Response response = authenticationService.verifyOTP(new OTPDto(identifier,otp));
         if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
@@ -47,8 +47,8 @@ public class AuthenticationController {
 
     @GetMapping("/resend-otp")
     public ResponseEntity<Response> resendOTP(
-            @RequestParam(value = "email") String email){
-        Response response = authenticationService.sendOTPToCurrentUser(new OTPDto(email,""),"verifyAccount");
+            @RequestParam(value = "identifier") String identifier){
+        Response response = authenticationService.resendOTP(identifier);
         if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }
@@ -60,7 +60,7 @@ public class AuthenticationController {
     @GetMapping("/forgot-password")
     public ResponseEntity<Response> forgotPassword(
             @RequestParam(value = "email") String email){
-        Response response = authenticationService.sendOTPToCurrentUser(new OTPDto(email,""),"");
+        Response response = authenticationService.sendOTPToCurrentUser("",email);
         if(response.getStatusCode() == StatusCode.badRequest.getCode()) {
             return ResponseEntity.status(400).body(response);
         }

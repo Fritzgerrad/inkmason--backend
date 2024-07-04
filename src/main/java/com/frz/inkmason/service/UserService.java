@@ -49,10 +49,11 @@ public class UserService {
 
         handleUser2FA(user);
 
-        String token = jwtUtil.generateToken(user);
+        //String token = jwtUtil.generateToken(user);
 
-        return new BodyResponse<>(StatusCode.successful.getCode(), "Account Created Successfully",
-                new AuthResponseBody(token, user.getFirstname(), user.getRole(), false, user.getId()));
+        return new BodyResponse<>(StatusCode.successful.getCode(), "Account Created Successfully",user.getId());
+               // new AuthResponseBody( user.getFirstname(), user.getRole(), false, user.getId()));
+
     }
 
     public void handleUser2FA(User user) {

@@ -2,9 +2,8 @@ package com.frz.inkmason.model.event;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.frz.inkmason.enums.BookingMode;
+import com.frz.inkmason.enums.BookingPlatform;
 import com.frz.inkmason.enums.Role;
-import com.frz.inkmason.model.person.Customer;
-import com.frz.inkmason.model.person.Guest;
 import com.frz.inkmason.model.person.Staff;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,13 +27,23 @@ public class Booking implements Serializable {
     @JsonManagedReference
     private Staff staff;
 
+    @Enumerated(EnumType.STRING)
     private Role bookerRole;
     private Long bookerId;
     private String bookerName;
-    private BookingMode mode;
+
+    //@Enumerated(EnumType.STRING)
+//    private BookingMode mode;
+    private String mode;
     private Date createdDate;
     private Date bookingDate;
     private String contactInformation;
     private String bookingTime;
+
+    //@Enumerated(EnumType.STRING)
+    //private BookingPlatform platform;
+    private String platform;
+    private boolean completed;
+
 
 }
